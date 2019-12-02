@@ -68,7 +68,7 @@ public class RequestsAdapter extends FirestoreRecyclerAdapter<Request,RequestsAd
     public RequestsAdapter(@NonNull FirestoreRecyclerOptions<Request> options) {
         super(options);
     }
-
+    //This is a comment
     @Override
     protected void onBindViewHolder(@NonNull final RequestsHolder holder, int position, @NonNull final Request model) {
         holder.title.setText(model.getMeetingpoint_info().get("MeetingPointName"));
