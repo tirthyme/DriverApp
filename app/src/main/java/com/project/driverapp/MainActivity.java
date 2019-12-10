@@ -1,8 +1,8 @@
 package com.project.driverapp;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.ActivityManager;
 import android.app.NotificationChannel;
@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,7 +27,7 @@ import com.project.driverapp.Utilities.Constants;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-FirebaseUser firebaseUser;
+    FirebaseUser firebaseUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +39,14 @@ FirebaseUser firebaseUser;
         if (firebaseUser != null) {
             m.setVisibility(View.VISIBLE);
             Log.d(TAG, "onCreate: " + firebaseUser.getDisplayName() + firebaseUser.getEmail());
-            /*FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                 @Override
                 public void onComplete(@NonNull Task<InstanceIdResult> task) {
                     InstanceIdResult res= task.getResult();
                     FirebaseFirestore.getInstance().collection("user_master").document(firebaseUser.getUid()).update("FirebaseCloudMessagingID",res.getToken());
                 }
-            });*/
-            /*startLocationService();*/
+            });
+            startLocationService();
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (Build.VERSION.SDK_INT >= 26) {
@@ -62,12 +64,17 @@ FirebaseUser firebaseUser;
         }
     }
 
+
+
     public void meetingPointActivityInt(View view){
         startActivity(new Intent(MainActivity.this,MeetingPointPicker.class));
     }
-
-    public void registerUser(View view){
-        startActivity(new Intent(MainActivity.this,RegistrationActivity.class));
+    public void signOut(View view){
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(MainActivity.this, MainActivity.class));
+            finish();
+        }
     }
 
     private void startLocationService(){

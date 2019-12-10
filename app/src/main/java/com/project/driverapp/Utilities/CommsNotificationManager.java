@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.project.driverapp.MainActivity;
 import com.project.driverapp.R;
+import com.project.driverapp.ViewUserRequestsActivity;
 
 public class CommsNotificationManager {
 
@@ -30,9 +31,20 @@ public class CommsNotificationManager {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,Constants.channel_id);
         builder.setSmallIcon(R.drawable.ic_launcher_foreground);
         builder.setContentTitle(Title).setContentText(body);
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, ViewUserRequestsActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
+        NotificationManager notificationManager =(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (notificationManager != null){
+            notificationManager.notify(1,builder.build());
+        }
+    }
+
+    public void displayConfirmation(String Title, String body){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,Constants.channel_id);
+        builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+        builder.setContentTitle(Title).setContentText(body);
         NotificationManager notificationManager =(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (notificationManager != null){

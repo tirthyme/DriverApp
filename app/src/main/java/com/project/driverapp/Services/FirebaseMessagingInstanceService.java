@@ -25,14 +25,18 @@ public class FirebaseMessagingInstanceService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String s){
-        FirebaseFirestore.getInstance().collection("user_master").document(FirebaseAuth.getInstance().getUid()).update("FirebaseCloudMessagingID",s);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseFirestore.getInstance().collection("user_master").document(FirebaseAuth.getInstance().getUid()).update("FirebaseCloudMessagingID", s);
+        }
     }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        Log.d("kkkk", "onMessageReceived: Message Recieved");
         String title = remoteMessage.getNotification().getTitle();
         String body = remoteMessage.getNotification().getBody();
+        if(remoteMessage.getData().get("req_type").equals(""))
         CommsNotificationManager.getInstance(getApplicationContext()).display(title,body);
 
     }

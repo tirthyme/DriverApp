@@ -49,6 +49,7 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.project.driverapp.MainActivity;
+import com.project.driverapp.NavigationActivity;
 import com.project.driverapp.R;
 
 import retrofit2.Call;
@@ -96,10 +97,11 @@ public class RequestsAdapter extends FirestoreRecyclerAdapter<Request,RequestsAd
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
-                                                Intent intent = new Intent(holder.context, MainActivity.class);
+                                                Intent intent = new Intent(holder.context, NavigationActivity.class);
                                                 Map<String, Object> map = new HashMap<>();
                                                 map.put("holder", holder);
                                                 intent.putExtra("meetingpointID", model.getMeetingpointID());
+                                                intent.putExtra("requestID", model.getId());
                                                 intent.putExtra("meetingpointLat", String.valueOf(model.getMeetingpoint_info().get("MeetingPointLat")));
                                                 intent.putExtra("meetingpointLon", String.valueOf(model.getMeetingpoint_info().get("MeetingPointLon")));
                                                 intent.putExtra("driverID", model.getDriverID());
