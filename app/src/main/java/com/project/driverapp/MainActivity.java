@@ -9,11 +9,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,10 +24,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.project.driverapp.Services.LocationService;
 import com.project.driverapp.Utilities.Constants;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements PermissionsListener {
     private static final String TAG = "MainActivity";
     FirebaseUser firebaseUser;
     @Override
@@ -35,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout signin = findViewById(R.id.reglog);
         LinearLayout m = findViewById(R.id.maplog);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
+        enableLocationPermission();
         if (firebaseUser != null) {
+            startLocationService();
             m.setVisibility(View.VISIBLE);
             Log.d(TAG, "onCreate: " + firebaseUser.getDisplayName() + firebaseUser.getEmail());
             FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -46,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
                     FirebaseFirestore.getInstance().collection("user_master").document(firebaseUser.getUid()).update("FirebaseCloudMessagingID",res.getToken());
                 }
             });
-            startLocationService();
-
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (Build.VERSION.SDK_INT >= 26) {
                 NotificationChannel channel = new NotificationChannel(Constants.channel_id, Constants.channel_name, NotificationManager.IMPORTANCE_HIGH);
@@ -58,13 +67,9 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.createNotificationChannel(channel);
             }
         }else{
-
             signin.setVisibility(View.VISIBLE);
-
         }
     }
-
-
 
     public void meetingPointActivityInt(View view){
         startActivity(new Intent(MainActivity.this,MeetingPointPicker.class));
@@ -113,6 +118,39 @@ public class MainActivity extends AppCompatActivity {
     public void viewIncomingRequests(View view){
         startActivity(new Intent(MainActivity.this,ViewUserRequestsActivity.class));
         finish();
+    }
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) { }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            if (firebaseUser != null) {
+                startLocationService();
+            }
+        } else {
+            Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+    PermissionsManager permissionsManager;
+    private void enableLocationPermission() {
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            if (firebaseUser != null) {
+                startLocationService();
+            }
+        }
+        else {
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(this);
+        }
     }
 
 }

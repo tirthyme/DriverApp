@@ -97,17 +97,9 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 
 public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener {
-
-    private static final String GEOJSON_SOURCE_ID = "GEOJSON_SOURCE_ID";
-    private static final String MARKER_IMAGE_ID = "MARKER_IMAGE_ID";
-    private static final String MARKER_LAYER_ID = "MARKER_LAYER_ID";
-    private static final String CALLOUT_LAYER_ID = "CALLOUT_LAYER_ID";
-    private static final String PROPERTY_SELECTED = "selected";
-    private static final String PROPERTY_NAME = "name";
-    private static final String PROPERTY_CAPITAL = "capital";
     MapView mapView;
     MapboxMap mapboxMap;
-    Button selector;
+    Button selector,back;
     PermissionsManager permissionsManager;
     ImageView hoveringMarker;
     Layer droppedMarkerLayer;
@@ -121,6 +113,14 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Mapbox.getInstance(MeetingPointPicker.this,getResources().getString(R.string.access_token));
         setContentView(R.layout.activity_meeting_point_picker);
+        back = findViewById(R.id.BackButton);
+        back.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MeetingPointPicker.this,MainActivity.class));
+                finish();
+            }
+        });
         mapView = findViewById(R.id.meetingPoint_mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
@@ -177,7 +177,7 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                                                 EditText placeName = dialogview.findViewById(R.id.inp_meetingPointName);
                                                 EditText placeAddress = dialogview.findViewById(R.id.inp_meetingPointAddress);
                                                 String place_name, place_address;
-                                                if (!placeName.getText().toString().equals("") && !placeName.getText().toString().equals("")){
+                                                if (!placeName.getText().toString().equals("") || !placeAddress.getText().toString().equals("")){
                                                     place_name = placeName.getText().toString();
                                                     place_address = placeAddress.getText().toString();
                                                     HashMap<String, Object> map
@@ -193,6 +193,7 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                                                             Toast.makeText(MeetingPointPicker.this, "Meeting Point Added", Toast.LENGTH_SHORT).show();
                                                             Timber.tag("Success").d("Data Added Finally");
                                                             hoveringMarkerVisible(style);
+                                                            reload();
                                                         }
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
@@ -228,16 +229,12 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
 
         mapboxMap.addOnMapClickListener(MeetingPointPicker.this);
     }
-
-
     Location location;
     LocationComponent locationComponent;
     private void enableLocationPlugin(@NonNull Style loadedMapStyle) {
-// Check if permissions are enabled and if not request
+        // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
 
-// Get an instance of the component. Adding in LocationComponentOptions is also an optional
-// parameter
             locationComponent = mapboxMap.getLocationComponent();
             locationComponent.activateLocationComponent(LocationComponentActivationOptions.builder(
                     this, loadedMapStyle).build());
@@ -249,7 +246,7 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                 Log.d("UTAG", "enableLocationPlugin: NOT NULL");
 
             }
-// Set the component's camera mode
+            // Set the component's camera mode
             locationComponent.setCameraMode(CameraMode.TRACKING);
             locationComponent.setRenderMode(RenderMode.NORMAL);
 
@@ -268,7 +265,7 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
     }
 
     private void initDroppedMarker(@NonNull Style loadedMapStyle) {
-// Add the marker image to map
+        // Add the marker image to map
         loadedMapStyle.addImage("dropped-icon-image", BitmapFactory.decodeResource(
                 getResources(), R.drawable.map_marker_dark));
         loadedMapStyle.addSource(new GeoJsonSource("dropped-marker-source-id"));
@@ -305,54 +302,6 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
         }
     }
 
-    /*private void reverseGeocode(final Point point) {
-        try {
-            MapboxGeocoding client = MapboxGeocoding.builder()
-                    .accessToken(getString(R.string.access_token))
-                    .query(Point.fromLngLat(point.longitude(), point.latitude()))
-                    .geocodingTypes(GeocodingCriteria.TYPE_ADDRESS)
-                    .build();
-
-            client.enqueueCall(new Callback<GeocodingResponse>() {
-                @Override
-                public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
-
-                    if (response.body() != null) {
-                        List<CarmenFeature> results = response.body().features();
-                        if (results.size() > 0) {
-                            final CarmenFeature feature = results.get(0);
-
-// If the geocoder returns a result, we take the first in the list and show a Toast with the place name.
-                            mapboxMap.getStyle(new Style.OnStyleLoaded() {
-                                @Override
-                                public void onStyleLoaded(@NonNull Style style) {
-                                    if (style.getLayer(DROPPED_MARKER_LAYER_ID) != null) {
-                                        Toast.makeText(MeetingPointPicker.this,
-                                                String.format("Place Name:",
-                                                        feature.placeName()), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
-                        } else {
-                            Toast.makeText(MeetingPointPicker.this,
-                                    "No Results", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
-                    Timber.e("Geocoding Failure: %s", throwable.getMessage());
-                }
-            });
-        } catch (ServicesException servicesException) {
-            Timber.e("Error geocoding: %s", servicesException.toString());
-            servicesException.printStackTrace();
-        }
-    }*/
-
-
     public void updateCameraLocation(Double latitude ,Double longitude){
         CameraPosition position = new CameraPosition.Builder()
                 .target(new LatLng(latitude, longitude)) // Sets the new camera position
@@ -383,7 +332,6 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                     ImageView imageView;
                     for (final DocumentSnapshot snapshot : snapshots){
                         if ((Double)snapshot.get("longitude") <= gtThanLonPoint ||(Double) snapshot.get("longitude") >= lessThanLonPoint){
-                            /*symbolLayerIconFeatureList.add(Feature.fromGeometry(Point.fromLngLat((Double)snapshot.get("longitude"),)));*/
                             customView = LayoutInflater.from(MeetingPointPicker.this).inflate(
                                     R.layout.pointerview, null);
                             imageView = customView.findViewById(R.id.img_view);
@@ -489,6 +437,11 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
         return false;
+    }
+
+    void reload(){
+        startActivity(new Intent(MeetingPointPicker.this,MeetingPointPicker.class));
+        finish();
     }
 
 
