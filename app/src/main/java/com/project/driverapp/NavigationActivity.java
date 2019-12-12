@@ -199,7 +199,7 @@ public class NavigationActivity extends AppCompatActivity implements OnNavigatio
     @Override
     public void onProgressChange(Location location, RouteProgress routeProgress) {
         setSpeed(location);
-        if(routeProgress.distanceRemaining()<=5 && !flag){
+        if(routeProgress.distanceRemaining()<=15 && !flag){
             flag = true;
             FirebaseFirestore.getInstance().collection("requests_master").document(reqID).update("driver_onWay","reached").addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
