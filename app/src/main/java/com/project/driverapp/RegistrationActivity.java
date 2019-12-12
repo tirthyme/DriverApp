@@ -68,6 +68,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                 map.put("user_name",name.getText().toString());
                                 map.put("user_email",email.getText().toString());
                                 map.put("type","Driver");
+                                map.put("allocated","no");
                                 map.put("user_pass",pass.getText().toString());
                                 map.put("user_phone",phone.getText().toString());
                                 FirebaseFirestore.getInstance().collection("user_master").document(firebaseUser.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
