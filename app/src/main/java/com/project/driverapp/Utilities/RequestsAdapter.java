@@ -80,6 +80,9 @@ public class RequestsAdapter extends FirestoreRecyclerAdapter<Request,RequestsAd
             holder.status.setText("Status: Waiting for Accepted");
         }else{
             holder.status.setText("Accepted");
+            if (model.getClient_onWay().equals("yes")){
+                holder.status.setText("Accepted and Client on Way");
+            }
         }
         holder.del_name.setText("Driver Name: " + model.getDriver_info().get("driver_name"));
         holder.del_phone.setText("Driver Phone: " + model.getDriver_info().get("driver_phone"));
