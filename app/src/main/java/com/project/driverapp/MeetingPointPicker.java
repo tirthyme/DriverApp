@@ -218,8 +218,6 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                                     }
                                 }
                             });
-                            // Use the map camera target's coordinates to make a reverse geocoding search
-                            /*reverseGeocode(Point.fromLngLat(mapTargetLatLng.getLongitude(), mapTargetLatLng.getLatitude()));*/
                         }
                         else{
                             hoveringMarkerVisible(style);
@@ -248,7 +246,6 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                 Log.d("UTAG", "enableLocationPlugin: NOT NULL");
 
             }
-            // Set the component's camera mode
             locationComponent.setCameraMode(CameraMode.TRACKING);
             locationComponent.setRenderMode(RenderMode.NORMAL);
 
@@ -258,7 +255,6 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                     getNearbyMeetingPoints(null,task.getResult());
                 }
             });
-            /*addNearbyMeetingPoints(locationComponent, markerViewManager);*/
 
         } else {
             permissionsManager = new PermissionsManager(this);
