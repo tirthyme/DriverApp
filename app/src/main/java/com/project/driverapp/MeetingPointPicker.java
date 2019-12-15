@@ -177,7 +177,7 @@ public class MeetingPointPicker extends AppCompatActivity implements OnMapReadyC
                                                 EditText placeName = dialogview.findViewById(R.id.inp_meetingPointName);
                                                 EditText placeAddress = dialogview.findViewById(R.id.inp_meetingPointAddress);
                                                 String place_name, place_address;
-                                                if (!placeName.getText().toString().equals("") && placeAddress.getText().toString().equals("")){
+                                                if (!placeName.getText().toString().equals("") && !placeAddress.getText().toString().equals("")){
                                                     place_name = placeName.getText().toString();
                                                     place_address = placeAddress.getText().toString();
                                                     HashMap<String, Object> map
