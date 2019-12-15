@@ -9,7 +9,7 @@ Certain pre-requirements are there to run this app correctly:
 3. User app is also required since the definition is divided into two apps which are UserApp which is to be used by client
    and DriverApp which is to be used by driver or the agent defined.
    
-   Link to UserApp:  https://github.com/tirthyme/UserApp/
+   Link to UserApp:  https://github.com/tirthyme/FT-191051-UserApp
    
    
 ***   Steps to use    ***
