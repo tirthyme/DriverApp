@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
         startActivity(new Intent(MainActivity.this,MeetingPointPicker.class));
     }
     public void signOut(View view){
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(MainActivity.this, MainActivity.class));
             finish();
